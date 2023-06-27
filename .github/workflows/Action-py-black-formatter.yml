@@ -1,4 +1,5 @@
 name: black-action
+# 워크플로의 이름을 정의
 on: [push, pull_request]
 jobs:
   linter_name:
