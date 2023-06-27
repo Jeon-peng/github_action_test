@@ -1,18 +1,16 @@
-name: reviewdog
-on: [pull_request]
+name: black-action
+on: [push, pull_request]
 jobs:
   linter_name:
-    name: runner / black formatter
+    name: runner / black
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      # Install specific version black (this step is not required. default is "black[jupyter]")
-      - run: pip install black==23.1.0
-      - uses: reviewdog/action-black@v3
+      - uses: actions/checkout@v2
+      - name: Check files using the black formatter
+        uses: datadog/action-py-black-formatter@v2.1
+        id: action_black
+      - name: Annotate diff changes using reviewdog
+        if: steps.action_black.outputs.is_formatted == 'true'
+        uses: reviewdog/action-suggester@v1
         with:
-          github_token: ${{ secrets.TOKEN }}
-          # Change reviewdog reporter if you need [github-pr-check, github-check].
-          reporter: github-pr-check
-          # Change reporter level if you need.
-          # GitHub Status Check won't become failure with a warning.
-          level: warning
+          tool_name: blackfmt
