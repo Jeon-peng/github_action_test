@@ -1,18 +1,30 @@
 name: black-action
+
 on: [push, pull_request]
+
 jobs:
   linter_name:
     name: runner / black
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
+
       - name: Check files using the black formatter
         uses: rickstaa/action-black@v1
         id: action_black
         with:
           black_args: "."
+
+      - name: Validate black formatting
+        run: |
+          if [ "${{ steps.action_black.outputs.is_formatted }}" != "true" ]; then
+            echo "::error::Black formatting check failed. Please format your code."
+            exit 1
+          fi
+
       - name: Create Pull Request
-        if: steps.action_black.outputs.is_formatted == 'true'
+        if: steps.action_black.outputs.is_formatted != 'true'
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.TOKEN }}
@@ -23,3 +35,22 @@ jobs:
             uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
           base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
           branch: actions/black
+
+          draft: true # Make the pull request a draft
+
+          maintainers_can_modify: false # Prevent maintainers from modifying the pull request
+
+          draft_message: |
+            ⚠️ **Warning: This pull request has code formatting issues.**
+
+            The Python code in this pull request does not comply with the black code formatter.
+
+            To fix the formatting issues, please follow these steps:
+            1. Install black: `pip install black`
+            2. Run black on the code: `black .`
+            3. Commit the changes: `git commit -am "Fix code formatting"`
+            4. Push the changes to the branch: `git push origin ${GITHUB_REF}`
+
+            Once the code formatting issues are fixed, this pull request will be automatically updated.
+
+          labels: code-formatting
