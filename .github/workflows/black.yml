@@ -1,7 +1,7 @@
 # 워크플로 이름 
 name: black-action
 # push or PR 일 때 실행
-on: [push, pull_request]
+on: pull_request
 jobs:
   linter_name:
     name: runner / black
