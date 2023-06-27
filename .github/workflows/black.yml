@@ -1,4 +1,5 @@
 name: black-action
+
 on:
   push:
     branches:
@@ -11,20 +12,35 @@ jobs:
   linter_name:
     name: runner / black
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
-      - name: Check files using the black formatter
-        uses: rickstaa/action-black@v1
-        id: action_black
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          black_args: "."
-      - name: Add comment to Pull Request
-        if: steps.action_black.outputs.is_formatted == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          python-version: 3.9
+
+      - name: Install black
+        run: pip install black
+
+      - name: Check files using the black formatter
+        id: action_black
         run: |
-          echo "::set-env name=INPUT_TOKEN::${{ secrets.TOKEN }}"
-          echo "::set-env name=INPUT_REPOSITORY::${{ github.repository }}"
-          echo "::set-env name=INPUT_PULL_REQUEST_NUMBER::${{ github.event.pull_request.number }}"
-          echo "::set-env name=INPUT_COMMENT::There appear to be some Python formatting errors in ${{ github.sha }}. This pull request uses the [psf/black](https://github.com/psf/black) formatter to fix these issues."
-          npx peter-evans/create-or-update-comment@v1
+          black_args=$(black --check --diff .)
+          if [[ -n $black_args ]]; then
+            echo "::set-output name=is_formatted::false"
+            echo "Code formatting issues found. Here are the suggested changes:"
+            echo "$black_args"
+            exit 1
+          else
+            echo "::set-output name=is_formatted::true"
+          fi
+
+      - name: Add comment to Pull Request
+        if: steps.action_black.outputs.is_formatted == 'false'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            There appear to be some Python formatting errors in ${{ github.sha }}.
+            This pull request uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
