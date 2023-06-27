@@ -17,7 +17,7 @@ jobs:
         id: action_black
         # 현재 디렉토리의 모든 파일을 대상으로 포매팅을 수행
         with:
-          black_args: ". --check --diff --fail_on_error"
+          black_args: ". --check --diff"
       - name: Create Pull Request
       # 포매팅이 필요한 경우에만 Pull Request를 생성
         if: steps.action_black.outputs.is_formatted == 'true'
