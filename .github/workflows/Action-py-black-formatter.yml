@@ -18,11 +18,10 @@ jobs:
         id: action_black
         with:
           black_args: "."
-      - name: Annotate diff changes using reviewdog
+      - name: Annotate diff changes using pullreminders/annotate-action
         if: steps.action_black.outputs.is_formatted == 'true'
-        uses: reviewdog/action-checkstyle@v2
+        uses: pullreminders/annotate-action@v2
         with:
-          name: blackfmt
-          reporter: github-pr-check
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tool_args: --formatter black --diff "HEAD^"
+          github_token: ${{ secrets.TOKEN }}
+          report_status: true
+          report_checks: true
