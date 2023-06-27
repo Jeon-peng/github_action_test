@@ -27,8 +27,8 @@ jobs:
       - name: Check files using the black formatter
         id: action_black
         run: |
-          black_args=$(black --check --diff . || true)
-          if [[ -n $black_args ]]; then
+          black_args=$(black --check --diff . 2>&1)
+          if [[ $? -ne 0 ]]; then
             echo "::error::Code formatting issues found. Here are the suggested changes:"
             echo "$black_args"
             exit 1
