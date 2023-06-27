@@ -1,43 +1,10 @@
-name: black-action
+name: Lint
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
-  linter_name:
-    name: runner / black
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-
-      - name: Install black
-        run: pip install black
-
-      - name: Check files using the black formatter
-        id: action_black
-        run: |
-          black_args=$(black --check --diff . 2>&1)
-          if [[ $? -ne 0 ]]; then
-            echo "::error::Code formatting issues found. Here are the suggested changes:"
-            echo "$black_args"
-            exit 1
-          fi
-
-      - name: Add comment to Pull Request
-        if: steps.action_black.outcome == 'failure'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: |
-            There appear to be some Python formatting errors in ${{ github.sha }}.
-            This pull request uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
