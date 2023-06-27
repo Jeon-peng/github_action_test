@@ -1,4 +1,3 @@
-name: black-action
 # 워크플로의 이름을 정의
 name: black-action
 # 초기는 push, PR 모두 해당하게 지정
