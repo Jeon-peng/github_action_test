@@ -20,8 +20,11 @@ jobs:
           black_args: "."
       - name: Add comment to Pull Request
         if: steps.action_black.outputs.is_formatted == 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: |
-            There appear to be some Python formatting errors in ${{ github.sha }}.
-            This pull request uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        run: |
+          echo "::set-env name=INPUT_TOKEN::${{ secrets.TOKEN }}"
+          echo "::set-env name=INPUT_REPOSITORY::${{ github.repository }}"
+          echo "::set-env name=INPUT_PULL_REQUEST_NUMBER::${{ github.event.pull_request.number }}"
+          echo "::set-env name=INPUT_COMMENT::There appear to be some Python formatting errors in ${{ github.sha }}. This pull request uses the [psf/black](https://github.com/psf/black) formatter to fix these issues."
+          npx peter-evans/create-or-update-comment@v1
