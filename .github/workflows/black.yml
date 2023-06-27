@@ -27,18 +27,15 @@ jobs:
       - name: Check files using the black formatter
         id: action_black
         run: |
-          black_args=$(black --check --diff .)
+          black_args=$(black --check --diff . || true)
           if [[ -n $black_args ]]; then
-            echo "::set-output name=is_formatted::false"
-            echo "Code formatting issues found. Here are the suggested changes:"
+            echo "::error::Code formatting issues found. Here are the suggested changes:"
             echo "$black_args"
             exit 1
-          else
-            echo "::set-output name=is_formatted::true"
           fi
 
       - name: Add comment to Pull Request
-        if: steps.action_black.outputs.is_formatted == 'false'
+        if: steps.action_black.outcome == 'failure'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           message: |
