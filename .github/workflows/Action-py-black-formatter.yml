@@ -1,11 +1,30 @@
-name: black-action
-on: [push, pull_request]
+name: Auto-format code with Black
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  linter_name:
-    name: runner / black formatter
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: datadog/action-py-black-formatter@v2.1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          check_mode: "true"
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Black formatter
+        uses: rickstaa/action-black@v1.3.1
+        with:
+          args: . 
