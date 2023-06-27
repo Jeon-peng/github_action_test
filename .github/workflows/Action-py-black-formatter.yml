@@ -1,34 +1,34 @@
-name: Modify Pull Request with Black Formatter
-
-on:
-  push:
-    branches:
-      - main
-
+name: black-action
+# 워크플로의 이름을 정의
+name: black-action
+# 초기는 push, PR 모두 해당하게 지정
+## PR 할 때마다 시간이 조금 걸리는 이슈있음
+## 추후 효율적인 방법으로 수정 예정
+on: [push, pull_request]
 jobs:
-  modify_pr:
-    name: Modify Pull Request
+  linter_name:
+    name: runner / black
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+    # 현재 리포지토리를 체크아웃
+      - uses: actions/checkout@v2
+      - name: Check files using the black formatter
+      # rickstaa/action-black 액션을 사용하여 black 포매터를 실행
+        uses: rickstaa/action-black@v1
+        id: action_black
+        # 현재 디렉토리의 모든 파일을 대상으로 포매팅을 수행
         with:
-          python-version: 3.x
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run Black formatter
-        run: |
-          pip install black
-          black .
-
-      - name: Modify Pull Request
-        uses: peter-evans/modify-pull-request@v1
+          black_args: "."
+      - name: Create Pull Request
+      # 포매팅이 필요한 경우에만 Pull Request를 생성
+        if: steps.action_black.outputs.is_formatted == 'true'
+        uses: peter-evans/create-pull-request@v3
         with:
-          add-labels: format
-          commit-message: "Apply black formatter to code"
+          token: ${{ secrets.TOKEN }}
+          title: "Format Python code with psf/black push"
+          commit-message: ":art: Format Python code with psf/black"
+          body: |
+            There appear to be some python formatting errors in ${{ github.sha }}. This pull request
+            uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
+          base: ${{ github.head_ref }} # Creates pull request onto pull request or commit branch
           branch: actions/black
