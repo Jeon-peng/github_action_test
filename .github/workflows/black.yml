@@ -15,13 +15,13 @@ jobs:
       - name: Find Python files
         id: find_files
         run: |
-          echo "::set-output name=files::$(find . -name '*.py' -type f)"
+          echo $(find . -name '*.py' -type f) > python_files.txt
 
       - name: Check files using the black formatter
         uses: rickstaa/action-black@v1
         id: action_black
-        with:
-          black_args: "${{ join(fromJson(steps.find_files.outputs.files), ' ') }}"
+        env:
+          FILES: ${{ steps.find_files.outputs.files }}
 
       - name: Create Pull Request
         if: steps.action_black.outputs.is_formatted == 'true'
@@ -39,14 +39,19 @@ jobs:
 
       - name: Modify Code with psf/black
         if: steps.action_black.outputs.is_formatted == 'true'
+        run: |
+          echo $FILES > python_files.txt
+          python_files=$(cat python_files.txt)
+          echo "::set-output name=python_files::$python_files"
+        shell: bash
+
+      - name: Comment on Commit
+        if: steps.action_black.outputs.is_formatted == 'true'
         uses: peter-evans/commit-comment@v1
         with:
           body: |
             The code style issues identified by psf/black have been automatically fixed.
             The modified code has been committed to the branch.
           commit: ${{ steps.create_pr.outputs.branch }}
-          path: .
+          path: ${{ steps.modify_code.outputs.python_files }}
 
-      - name: Exit Workflow
-        if: steps.action_black.outputs.is_formatted == 'true'
-        run: exit 1
