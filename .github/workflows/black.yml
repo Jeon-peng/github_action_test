@@ -21,7 +21,7 @@ jobs:
         uses: rickstaa/action-black@v1
         id: action_black
         with:
-          black_args: ${{ join(fromJson(steps.find_files.outputs.files), ' ') }}
+          black_args: "${{ join(fromJson(steps.find_files.outputs.files), ' ') }}"
 
       - name: Create Pull Request
         if: steps.action_black.outputs.is_formatted == 'true'
