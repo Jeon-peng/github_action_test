@@ -14,7 +14,7 @@ e=1 +2
 f= 1+2
 
 l = [i 
-     for i 
+            for i 
      in range(10)]
 
 print(l)
