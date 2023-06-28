@@ -11,11 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: Find Python files
+        id: find_files
+        run: |
+          echo "::set-output name=files::$(find . -name '*.py' -type f)"
+
       - name: Check files using the black formatter
         uses: rickstaa/action-black@v1
         id: action_black
         with:
-          black_args: "."
+          black_args: ${{ join(fromJson(steps.find_files.outputs.files), ' ') }}
 
       - name: Create Pull Request
         if: steps.action_black.outputs.is_formatted == 'true'
@@ -30,6 +36,17 @@ jobs:
             uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
           base: ${{ github.head_ref }}
           branch: actions/black
+
+      - name: Modify Code with psf/black
+        if: steps.action_black.outputs.is_formatted == 'true'
+        uses: peter-evans/commit-comment@v1
+        with:
+          body: |
+            The code style issues identified by psf/black have been automatically fixed.
+            The modified code has been committed to the branch.
+          commit: ${{ steps.create_pr.outputs.branch }}
+          path: .
+
       - name: Exit Workflow
-        if: steps.action_black.outputs.is_formatted == 'true' 
+        if: steps.action_black.outputs.is_formatted == 'true'
         run: exit 1
