@@ -23,20 +23,6 @@ jobs:
         env:
           FILES: ${{ steps.find_files.outputs.files }}
 
-      - name: Create Pull Request
-        if: steps.action_black.outputs.is_formatted == 'true'
-        uses: peter-evans/create-pull-request@v3
-        id: create_pr
-        with:
-          token: ${{ secrets.TOKEN }}
-          title: "Format Python code with psf/black push"
-          commit-message: "Modify Format Python code with psf/black"
-          body: |
-            There appear to be some python formatting errors in ${{ github.sha }}. This pull request
-            uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
-          base: ${{ github.head_ref }}
-          branch: actions/black
-
       - name: Modify Code with psf/black
         if: steps.action_black.outputs.is_formatted == 'true'
         run: |
@@ -45,6 +31,16 @@ jobs:
           echo "::set-output name=python_files::$python_files"
         shell: bash
 
+      - name: Commit and Push Changes
+        if: steps.action_black.outputs.is_formatted == 'true'
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add ${{ steps.modify_code.outputs.python_files }}
+          git commit -m "Auto-format Python code with psf/black"
+          git push
+        working-directory: ${{ github.workspace }}
+
       - name: Comment on Commit
         if: steps.action_black.outputs.is_formatted == 'true'
         uses: peter-evans/commit-comment@v1
@@ -52,6 +48,5 @@ jobs:
           body: |
             The code style issues identified by psf/black have been automatically fixed.
             The modified code has been committed to the branch.
-          commit: ${{ steps.create_pr.outputs.branch }}
+          commit: ${{ github.sha }}
           path: ${{ steps.modify_code.outputs.python_files }}
-
