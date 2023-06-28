@@ -1,7 +1,11 @@
 # 워크플로 이름 
 name: black-action
-# push or PR 일 때 실행
-on: pull_request
+# develop branch 로 push 했을 때에만 작동하도록 
+on:
+  push:
+    branches:
+      - 'main'
+
 jobs:
   linter_name:
     name: runner / black
