@@ -1,49 +1,49 @@
-name: black-action
+# name: black-action
 
-on:
-  push:
-    branches:
-      - 'main'
+# on:
+#   push:
+#     branches:
+#       - 'main'
 
-jobs:
-  linter_name:
-    name: runner / black
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+# jobs:
+#   linter_name:
+#     name: runner / black
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Find Python files
-        id: find_files
-        run: |
-          echo $(find . -name '*.py' -type f) > python_files.txt
+#       - name: Find Python files
+#         id: find_files
+#         run: |
+#           echo $(find . -name '*.py' -type f) > python_files.txt
 
-      - name: Check files using the black formatter
-        uses: rickstaa/action-black@v1
-        id: action_black
-        env:
-          FILES: ${{ steps.find_files.outputs.files }}
+#       - name: Check files using the black formatter
+#         uses: rickstaa/action-black@v1
+#         id: action_black
+#         env:
+#           FILES: ${{ steps.find_files.outputs.files }}
 
-      - name: Modify Code with psf/black
-        run: |
-          echo ${{ steps.find_files.outputs.files }}
-          python_files=${{ steps.find_files.outputs.files }}
-          echo "::set-output name=python_files::$python_files"
-        shell: bash
+#       - name: Modify Code with psf/black
+#         run: |
+#           echo ${{ steps.find_files.outputs.files }}
+#           python_files=${{ steps.find_files.outputs.files }}
+#           echo "::set-output name=python_files::$python_files"
+#         shell: bash
 
-      - name: Commit and Push Changes
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add ${{ steps.modify_code.outputs.python_files }}
-          git commit -m "Auto-format Python code with psf/black"
-          git push
-        working-directory: ${{ github.workspace }}
+#       - name: Commit and Push Changes
+#         run: |
+#           git config user.name github-actions
+#           git config user.email github-actions@github.com
+#           git add ${{ steps.modify_code.outputs.python_files }}
+#           git commit -m "Auto-format Python code with psf/black"
+#           git push
+#         working-directory: ${{ github.workspace }}
 
-      - name: Comment on Commit
-        uses: peter-evans/commit-comment@v1
-        with:
-          body: |
-            The code style issues identified by psf/black have been automatically fixed.
-            The modified code has been committed to the branch.
-          commit: ${{ github.sha }}
-          path: ${{ steps.modify_code.outputs.python_files }}
+#       - name: Comment on Commit
+#         uses: peter-evans/commit-comment@v1
+#         with:
+#           body: |
+#             The code style issues identified by psf/black have been automatically fixed.
+#             The modified code has been committed to the branch.
+#           commit: ${{ github.sha }}
+#           path: ${{ steps.modify_code.outputs.python_files }}
