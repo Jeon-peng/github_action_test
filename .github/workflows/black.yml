@@ -26,8 +26,8 @@ jobs:
       - name: Modify Code with psf/black
         if: steps.action_black.outputs.is_formatted == 'true'
         run: |
-          echo $FILES > python_files.txt
-          python_files=$(cat python_files.txt)
+          echo ${{ steps.find_files.outputs.files }}
+          python_files=${{ steps.find_files.outputs.files }}
           echo "::set-output name=python_files::$python_files"
         shell: bash
 
