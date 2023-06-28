@@ -24,7 +24,6 @@ jobs:
           FILES: ${{ steps.find_files.outputs.files }}
 
       - name: Modify Code with psf/black
-        if: steps.action_black.outputs.is_formatted == 'true'
         run: |
           echo ${{ steps.find_files.outputs.files }}
           python_files=${{ steps.find_files.outputs.files }}
@@ -32,7 +31,6 @@ jobs:
         shell: bash
 
       - name: Commit and Push Changes
-        if: steps.action_black.outputs.is_formatted == 'true'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
@@ -42,7 +40,6 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Comment on Commit
-        if: steps.action_black.outputs.is_formatted == 'true'
         uses: peter-evans/commit-comment@v1
         with:
           body: |
