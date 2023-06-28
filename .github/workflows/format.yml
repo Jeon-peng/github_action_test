@@ -16,6 +16,7 @@ jobs:
       - name: Commit changes
         uses: EndBug/add-and-commit@v4
         with:
+          token: ${{ secrets.TOKEN }}
           author_name: ${{ github.actor }}
           author_email: ${{ github.actor }}@users.noreply.github.com
           message: "Format code with black"
