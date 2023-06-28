@@ -30,21 +30,6 @@ jobs:
             uses the [psf/black](https://github.com/psf/black) formatter to fix these issues.
           base: ${{ github.head_ref }}
           branch: actions/black
-
-      - name: Merge Pull Request
-        if: steps.create_pr.outputs.pull-request-created == 'true'
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.TOKEN }}
-          script: |
-            const prNumber = "${{ steps.create_pr.outputs.pull-request-number }}";
-            const response = await github.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber
-            });
-            console.log(response);
-
       - name: Exit Workflow
-        if: steps.action_black.outputs.is_formatted == 'true' && steps.create_pr.outputs.pull-request-created == 'true'
+        if: steps.action_black.outputs.is_formatted == 'true' 
         run: exit 1
