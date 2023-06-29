@@ -1,28 +1,18 @@
-name: Format code
+ame: Format code
 
 on:
   push:
-    branches: [ develop ]
+    branches: [develop]
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install black
+      - name: Format code with black
         run: |
           pip install black
-      - name: Format Python files
-        run: |
-          for f in **/*.py; do
-            black "$f"
-          done
-      - name: Check for changes
-        run: |
-          if [[ $(git diff --stat --exit-code) -ne 0 ]]; then
-            git config user.name ${{ github.actor }}
-            git config user.email ${{ github.actor }}@users.noreply.github.com
-            git add .
-            git commit -m "Format code with black"
-            git push
-          fi
+          black .
+          git config user.name ${{ github.actor }}
+          git config user.email ${{ github.actor }}@users.noreply.github.com
+          git diff --quiet || (git add . && git commit -m "Format code with black" && git push)
