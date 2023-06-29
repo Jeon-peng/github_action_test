@@ -12,7 +12,7 @@ jobs:
       - name: Install black
         run: |
           pip install black
-          black .py
+          black ./*.py
           git config user.name ${{ github.actor }}
           git config user.email ${{ github.actor }}@users.noreply.github.com
           git diff --quiet || (git add . && git commit -m "Format code with black" && git push)
