@@ -9,10 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Format code with black
+      - name: Install black
         run: |
           pip install black
-          black .
+      - name: Format Python files
+        run: |
+          for f in **/*.py; do
+            black "$f"
+          done
+      - name: Check for changes
+        run: |
           if [[ $(git diff --stat --exit-code) -ne 0 ]]; then
             git config user.name ${{ github.actor }}
             git config user.email ${{ github.actor }}@users.noreply.github.com
