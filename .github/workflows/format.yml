@@ -16,3 +16,8 @@ jobs:
           git config user.name ${{ github.actor }}
           git config user.email ${{ github.actor }}@users.noreply.github.com
           git diff --quiet || (git add . && git commit -m "Format code with black" && git push)
+          if [ $? -eq 0 ]; then
+            echo "No changes to commit."
+          else
+            echo "Changes have been committed."
+          fi
