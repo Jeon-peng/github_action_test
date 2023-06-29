@@ -2,14 +2,14 @@ name: Format code
 
 on:
   push:
-    branches: [develop]
+    branches: [ develop ]
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Format code with black
+      - name: Install black
         run: |
           pip install black
           black .
